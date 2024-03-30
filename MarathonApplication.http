@@ -1,0 +1,6 @@
+@MarathonApplication_HostAddress = http://localhost:5207
+
+GET {{MarathonApplication_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
