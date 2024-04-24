@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace MarathonApplication.Controllers.Authentication
@@ -42,14 +43,9 @@ namespace MarathonApplication.Controllers.Authentication
 												request.City,
 												request.Street,
 												request.Birthday,
-												request.BirthPlace,
 												request.Gender,
 												request.Email,
 												request.Phone,
-												request.NbMarathon,
-												request.EmergencyPerson,
-												request.EmergencyMobile,
-												request.Remarks,
 												passwordHash);
 			_db.Participants.Add(participant);
 			_db.SaveChanges();
@@ -67,8 +63,27 @@ namespace MarathonApplication.Controllers.Authentication
 				return NotFound("Your credentials are wrong");
 			}
 			string token = CreateToken(participant);
+			/*
+			var refreshToken = GenerateRefreshToken();
+			setRefreshToken(refreshToken);
+			*/
 			return Ok(token);
 		}
+		/* 
+		 * I tried to use this for 
+		private RefreshToken GenerateRefreshToken()
+		{
+			var refreshToken = new RefreshToken
+			{
+				Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+				Expires = DateTime.Now.AddDays(7)
+			};
+			return refreshToken;
+		}
+		private void SetRefreshToken(RefreshToken refreshToken)
+		{
+
+		}*/
 		private string CreateToken(Participant participant)
 		{
 			List<Claim> claims = new List<Claim> {

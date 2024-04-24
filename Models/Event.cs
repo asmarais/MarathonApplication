@@ -21,8 +21,7 @@ namespace MarathonApplication.Models
 		public int? DaysBeforeTheEvent { get; set; }
 		[DisplayName("Status")]
 		public string Status { get; set; }
-        [DisplayName("Remarks")]
-        public string? Remarks { get; set; }
+        
 		[JsonIgnore]
 
 		public ICollection<EventAttribute>? EventAttributes { get; } = new List<EventAttribute>();

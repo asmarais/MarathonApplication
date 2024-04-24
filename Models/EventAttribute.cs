@@ -11,13 +11,11 @@ namespace MarathonApplication.Models
 		public int Id { get; set; }
 		public int EventTypeFK { get; set; }
 		public int EventFK { get; set; }
-		[NotMapped] // This property will not be mapped to the database
-		public bool IsSelected { get; set; }
 		[JsonIgnore]
 		public Event? Event { get; set; }
 		[JsonIgnore]
-
 		public EventType? EventType { get; set; }
+		[JsonIgnore]
 		public ICollection<Participantsrun>? Participantsruns { get; set; }
 	}
 }

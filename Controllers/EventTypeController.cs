@@ -52,5 +52,28 @@ namespace MarathonApplication.Controllers
 				return BadRequest(ModelState);
 			}
 		}
+		[HttpDelete("{id:int}")]
+		public IActionResult DeleteType(int id)
+		{
+			EventType? obj = _db.EventTypes.Find(id);
+			if (obj == null)
+			{
+				return NotFound();
+			}
+			_db.EventTypes.Remove(obj);
+			_db.SaveChanges();
+			return NoContent();
+		}
+		[HttpPut("{id:int}")]
+		public IActionResult UpdateItem(int id, [FromBody] EventType type)
+		{
+			if (type == null)
+			{
+				return NotFound();
+			}
+			_db.EventTypes.Update(type);
+			_db.SaveChanges();
+			return Ok(type);
+		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MarathonApplication.Models;
+using System.Data;
 
 
 namespace MarathonApplication.Data
@@ -15,7 +16,9 @@ namespace MarathonApplication.Data
 		public DbSet<Event> Events { get; set; }
 		public DbSet<EventAttribute> EventAttributes { get; set; }
 		public DbSet<EventType> EventTypes { get; set; }
+		public DbSet<RefreshToken> RefreshTokens { get; set; }
 		public DbSet<User> Users { get; set; }
+		public DbSet<Role> Roles { get; set; }
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
@@ -24,6 +27,10 @@ namespace MarathonApplication.Data
 				new EventType { Id = 2, Type = "Half Marathon" },
 				new EventType { Id = 3, Type = "Marathon" }
 			);
+			modelBuilder.Entity<Role>().HasData(
+				new Role { Id = 1, role = "Admin"},
+				new Role { Id = 2, role = "Moderator" }
+				);
 			modelBuilder.Entity<Participantsrun>()
 				.HasKey(sc => new { sc.EventAttributeFK, sc.ParticipantFK });
 

@@ -9,11 +9,11 @@ namespace MarathonApplication.Controllers
 {
 	[Route("api/EventAttributes")]
 	[ApiController]
-	public class EventAttribute : ControllerBase
+	public class EventAttributeController : ControllerBase
 	{
 		private readonly ApplicationDbContext _db;
 
-		public EventAttribute(ApplicationDbContext db)
+		public EventAttributeController(ApplicationDbContext db)
 		{
 			_db = db;
 		}
@@ -25,7 +25,7 @@ namespace MarathonApplication.Controllers
 			return Ok(attributes);
 		}
 		[HttpGet("{id:int}")]
-		public ActionResult<EventAttribute> GetEventAttribtes(int id)
+		public ActionResult<EventAttribute> GetEventAttributes(int id)
 		{
 			if (id == 0)
 			{
@@ -38,21 +38,70 @@ namespace MarathonApplication.Controllers
 			}
 			return Ok(attribute);
 		}
-		/*
+
 		[HttpPost]
-		public IActionResult CreateEventAttribute([FromBody] EventAttribute attribute)
+		public IActionResult CreateEventAttributes([FromBody] EventAttribute attribute)
 		{
-			if (ModelState.IsValid)
+			try
 			{
-				_db.EventAttributes.Add(attribute);
-				_db.SaveChanges();
-				return CreatedAtAction(nameof(GetEventAttribtes), new { id = attribute.Id });
+				if (ModelState.IsValid)
+				{
+					_db.EventAttributes.Add(attribute);
+					_db.SaveChanges();
+					return CreatedAtAction(nameof(GetEventAttributes), new { id = attribute.Id }, attribute);
+				}
+				else
+				{
+					return BadRequest(ModelState);
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				return BadRequest(ModelState);
+				// Log the exception or handle it accordingly
+				return StatusCode(500, "An error occurred while processing the request.");
 			}
 		}
-		*/
+
+		[HttpPut("{id}")]
+		public IActionResult UpdateEventAttribute(int id, [FromBody] EventAttribute attribute)
+		{
+			if (id != attribute.Id)
+			{
+				return BadRequest();
+			}
+			var existingAttribute = _db.EventAttributes.Find(id);
+			if (existingAttribute == null)
+			{
+				return NotFound();
+			}
+			existingAttribute.EventTypeFK = attribute.EventTypeFK;
+			existingAttribute.EventFK = attribute.EventFK;
+
+			_db.Entry(existingAttribute).State = EntityState.Modified;
+
+			try
+			{
+				_db.SaveChanges();
+				return Ok(existingAttribute);
+			}
+			catch (DbUpdateConcurrencyException)
+			{
+				if (!EventAttributeExists(id))
+				{
+					return NotFound();
+				}
+				else
+				{
+					throw;
+				}
+			}
+		}
+		private bool EventAttributeExists(int id)
+		{
+			return _db.EventAttributes.Any(e => e.Id == id);
+		}
+
+
 	}
 }
+
