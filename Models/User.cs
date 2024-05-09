@@ -10,6 +10,8 @@ namespace MarathonApplication.Models
 		public string Username { get; set; } = string.Empty;
 		public string PasswordHash { get; set; } = string.Empty;
 		public Role Role { get; set; }
+		public string RefreshToken { get; set; } = string.Empty;
+		public DateTime? TokenExpiryDate { get; set; } 
 
 
 		public User(string username, string password, Role role)

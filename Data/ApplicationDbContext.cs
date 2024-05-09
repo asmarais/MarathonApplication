@@ -16,7 +16,6 @@ namespace MarathonApplication.Data
 		public DbSet<Event> Events { get; set; }
 		public DbSet<EventAttribute> EventAttributes { get; set; }
 		public DbSet<EventType> EventTypes { get; set; }
-		public DbSet<RefreshToken> RefreshTokens { get; set; }
 		public DbSet<User> Users { get; set; }
 		public DbSet<Role> Roles { get; set; }
 		protected override void OnModelCreating(ModelBuilder modelBuilder)

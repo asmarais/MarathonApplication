@@ -50,12 +50,7 @@ namespace MarathonApplication.Controllers
 				= BCrypt.Net.BCrypt.HashPassword(request.PasswordHash);
 				var participant = new Participant(request.FirstName,
 												  request.LastName,
-													request.Country,
-													request.ZipCode,
-													request.City,
-													request.Street,
 													request.Birthday,
-													request.Gender,
 													request.Email,
 													request.Phone,
 													passwordHash);

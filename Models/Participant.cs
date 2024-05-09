@@ -17,36 +17,25 @@ namespace MarathonApplication.Models
 		public string? City { get; set; }
 		public string? Street { get; set; }
 		public DateOnly Birthday { get; set; } 
-		public string Gender { get; set; }
+		public string? Gender { get; set; }
 		public string Email { get; set; }
 		public string PasswordHash { get; set; }
 		public string Phone { get; set; }
-		
-		
+		public string RefreshToken { get; set; } = string.Empty;
+		public DateTime? TokenExpiryDate { get; set; }
 		[JsonIgnore]
 		public ICollection<Participantsrun>? Participantsruns { get; set; }
 		public Participant(
 		string firstName,
 		string lastName,
-		string? country,
-		string? zipCode,
-		string? city,
-		string? street,
 		DateOnly birthday,
-		string gender,
 		string email,
 		string phone,
-		
 		string passwordHash)
 		{
 			FirstName = firstName;
 			LastName = lastName;
-			Country = country;
-			ZipCode = zipCode;
-			City = city;
-			Street = street;
 			Birthday = birthday;
-			Gender = gender;
 			Email = email;
 			Phone = phone;
 			PasswordHash = passwordHash;

@@ -5,26 +5,36 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 
 namespace MarathonApplication.Controllers
 {
-
+	[Authorize]
 	[Route("api/Events")]
 	[ApiController]
-	[Authorize]
 	public class EventController : ControllerBase
 	{
 		private readonly ApplicationDbContext _db;
+		private readonly IWebHostEnvironment _hostEnvironment;
 
-		public EventController(ApplicationDbContext db)
+		public EventController(ApplicationDbContext db, IWebHostEnvironment hostEnvironment)
 		{
 			_db = db;
+			this._hostEnvironment = hostEnvironment;
 		}
-
 		[HttpGet]
 		public ActionResult<IEnumerable<Event>> GetEvents()
 		{
 			var events = _db.Events.ToList();
+			foreach (var obj in events)
+			{
+				if (obj.Status == "open" && obj.Start < DateTime.Today)
+				{
+					obj.Status = "closed";
+					_db.Events.Update(obj);
+					_db.SaveChanges();
+				}
+			}
 			return Ok(events);
 		}
 		[HttpGet("{id:int}")]
@@ -48,19 +58,30 @@ namespace MarathonApplication.Controllers
 			return Ok(results);
 		}
 		[HttpPost]
-		public IActionResult CreateEvent([FromBody] Event even)
+		public IActionResult CreateEvent([FromForm] Event even)
 		{
-			if (ModelState.IsValid)
+			var imageFile = even.ImageFile;
+			try
 			{
+				string imageName = new String(Path.GetFileNameWithoutExtension(imageFile.FileName).Take(10).ToArray()).Replace(' ', '-');
+				imageName = imageName + DateTime.Now.ToString("yymmssfff") + Path.GetExtension(imageFile.FileName);
+				var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "Images", imageName);
+				even.ImageName = imageName;
+				using (var fileStream = new FileStream(imagePath, FileMode.Create))
+				{
+					imageFile.CopyToAsync(fileStream);
+				}
+
 				_db.Events.Add(even);
 				_db.SaveChanges();
 				return CreatedAtAction(nameof(GetEvents), new { id = even.Id });
+
 			}
-			else
-			{
-				return BadRequest(ModelState);
-			}
+			catch (Exception){
+				return StatusCode(500);
+				}
 		}
+
 		[HttpDelete("{id:int}")]
 		public IActionResult DeleteEvent(int id)
 		{
@@ -70,25 +91,16 @@ namespace MarathonApplication.Controllers
 				return NotFound();
 			}
 			var attributes = _db.EventAttributes.ToList().Where(u => u.EventFK == id);
-			foreach(var attribute in attributes) {
+			foreach (var attribute in attributes)
+			{
 				_db.EventAttributes.Remove(attribute);
 			}
 			_db.Events.Remove(obj);
 			_db.SaveChanges();
 			return NoContent();
 		}
-		/*
-		[HttpPut("{id:int}")]
-		public IActionResult UpdateEvent(int id, [FromBody] Event Event)
-		{
-			if (Event == null)
-			{
-				return NotFound();
-			}
-			_db.Events.Update(Event);
-			_db.SaveChanges();
-			return Ok(Event);
-		}
-		*/
+
+		
 	}
 }
+

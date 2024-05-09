@@ -1,8 +1,10 @@
-﻿using MarathonApplication.Data;
+﻿using Azure.Core;
+using MarathonApplication.Data;
 using MarathonApplication.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -23,27 +25,25 @@ namespace MarathonApplication.Controllers.Authentication
 			_db = db;
 			_conf = conf;
 		}
-		//Read data from claim I will change this using services to access data everywhere
-		[HttpGet, Authorize]
-		public ActionResult<object> Get()
+		public class LoginDto
 		{
-			var role = ClaimTypes.Role;
-			return Ok(new { role});
+			public string Email { get; set; }
+			public string Password { get; set; }
 		}
-		
+
 		[HttpPost("register")]
 		public ActionResult<Participant> Register(ParticipantDto request)
-		{ 
+		{
+			var result = _db.Participants.FirstOrDefault(r => r.Email == request.Email);
+			if (result != null)
+			{
+				return BadRequest("User exists");
+			}
 			string passwordHash
 				= BCrypt.Net.BCrypt.HashPassword(request.Password);
 			var participant = new Participant(request.FirstName,
 											  request.SecondName,
-												request.Country,
-												request.ZipCode,
-												request.City,
-												request.Street,
 												request.Birthday,
-												request.Gender,
 												request.Email,
 												request.Phone,
 												passwordHash);
@@ -54,41 +54,27 @@ namespace MarathonApplication.Controllers.Authentication
 		}
 		
 		[HttpPost("login")]
-		public ActionResult<Participant> Login(ParticipantDto request) 
+		public ActionResult<Participant> Login(LoginDto request) 
 		{		
 			var participant = _db.Participants.FirstOrDefault(u => u.Email == request.Email);
-			if (participant == null 
-				|| !BCrypt.Net.BCrypt.Verify(request.Password, participant.PasswordHash))
+			if (participant == null || !BCrypt.Net.BCrypt.Verify(request.Password, participant.PasswordHash))
 			{
 				return NotFound("Your credentials are wrong");
 			}
-			string token = CreateToken(participant);
-			/*
+			string accessToken = CreateToken(participant);
 			var refreshToken = GenerateRefreshToken();
-			setRefreshToken(refreshToken);
-			*/
-			return Ok(token);
-		}
-		/* 
-		 * I tried to use this for 
-		private RefreshToken GenerateRefreshToken()
-		{
-			var refreshToken = new RefreshToken
-			{
-				Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-				Expires = DateTime.Now.AddDays(7)
-			};
-			return refreshToken;
-		}
-		private void SetRefreshToken(RefreshToken refreshToken)
-		{
 
-		}*/
+			participant.RefreshToken = refreshToken.Token;
+			participant.TokenExpiryDate = refreshToken.Expires;
+			_db.Participants.Update(participant);
+			_db.SaveChanges();
+			return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
+		}
 		private string CreateToken(Participant participant)
 		{
 			List<Claim> claims = new List<Claim> {
-				new Claim(ClaimTypes.Email, participant.Email),
-				new Claim(ClaimTypes.Role, "MobileUser"),
+				new Claim("Email", participant.Email),
+				new Claim("Role", "mobile")
 			};
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
 				_conf.GetSection("JWT:Key").Value!));
@@ -102,6 +88,41 @@ namespace MarathonApplication.Controllers.Authentication
 			var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 			return (jwt);
 		}
+
+		[HttpPost("refresh")]
+		public async Task<ActionResult> RefreshToken(RefreshToken refreshToken)
+		{
+			var participant = ValidateRefreshToken(refreshToken);
+			if (participant == null)
+			{
+				return Unauthorized("Invalid refresh token");
+			}
+			var newAccessToken = CreateToken(participant);
+			return Ok(new
+			{
+				AccessToken = newAccessToken,
+			});
+		}
+
+		private Participant ValidateRefreshToken(RefreshToken refreshToken)
+		{
+			var participant = _db.Participants.Where(u => u.RefreshToken == refreshToken.Token && u.TokenExpiryDate >= DateTime.UtcNow).FirstOrDefault();
+			return participant;
+		}
 		
+		private RefreshToken GenerateRefreshToken()
+		{
+			var refreshToken = new RefreshToken
+			{
+				Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+				Expires = DateTime.Now.AddDays(30)
+			};
+			return refreshToken;
+		}
+
+
 	}
+
+
 }
+

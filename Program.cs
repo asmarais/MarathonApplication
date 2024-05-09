@@ -9,8 +9,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -35,11 +33,8 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 builder.Services.AddAuthentication( x=> { 
 	x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 	x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddCookie( x => 
-{
-	x.Cookie.Name = "AccessToken";
-
-}).AddJwtBearer(options =>
+})
+	.AddJwtBearer(options =>
 {
 	options.TokenValidationParameters = new TokenValidationParameters
 	{
@@ -48,14 +43,6 @@ builder.Services.AddAuthentication( x=> {
 		ValidateIssuer = false,
 		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
 				builder.Configuration.GetSection("JWT:Key").Value!))
-	};
-	options.Events = new JwtBearerEvents
-	{
-		OnMessageReceived = context =>
-		{
-			context.Token = context.Request.Cookies["AccessToken"];
-			return Task.CompletedTask;
-		}
 	};
 });
 builder.Services.AddCors(options =>
@@ -68,6 +55,8 @@ builder.Services.AddCors(options =>
 			.AllowCredentials());
 });
 
+
+
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
@@ -79,6 +68,7 @@ if (app.Environment.IsDevelopment())
 	app.UseSwaggerUI();
 }
 app.UseCors("AllowSpecificOrigins");
+
 
 app.UseHttpsRedirection();
 
