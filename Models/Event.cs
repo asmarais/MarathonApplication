@@ -18,7 +18,24 @@ namespace MarathonApplication.Models
         public string? ImageName { get; set; }
         [NotMapped]
 		public IFormFile ImageFile { get; set; }
+        [NotMapped]
+        public string ImageSrc { get; set; }
 		[JsonIgnore]
 		public ICollection<EventAttribute>? EventAttributes { get; } = new List<EventAttribute>();
-	}
+        public Event(int id, string eventName, string desciption, DateTime start, DateTime end, string status, string imageName, string imageSrc)
+        {
+            Id = id;
+            EventName = eventName;
+            Description = desciption;
+            Start = start;
+            End = end;
+            Status = status;
+            ImageName = imageName;
+            ImageSrc = imageSrc;
+        }
+        public Event()
+        {
+            
+        }
+    }
 }

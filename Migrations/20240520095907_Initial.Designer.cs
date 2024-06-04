@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MarathonApplication.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240509140142_TablesTodDb")]
-    partial class TablesTodDb
+    [Migration("20240520095907_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -127,12 +127,6 @@ namespace MarathonApplication.Migrations
                     b.Property<DateOnly>("Birthday")
                         .HasColumnType("date");
 
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -160,14 +154,8 @@ namespace MarathonApplication.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Street")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("TokenExpiryDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("ZipCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -182,39 +170,51 @@ namespace MarathonApplication.Migrations
                     b.Property<int>("ParticipantFK")
                         .HasColumnType("int");
 
-                    b.Property<int>("Id")
+                    b.Property<int?>("Calories")
                         .HasColumnType("int");
+
+                    b.Property<string>("EndPosition")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeOnly?>("Pace")
+                        .HasColumnType("time");
 
                     b.Property<DateTime>("Registration")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("Run_10")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly?>("Run_10")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime?>("Run_20")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly?>("Run_20")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime?>("Run_30")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly?>("Run_30")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime?>("Run_40")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly?>("Run_40")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime?>("Run_HM")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly?>("Run_HM")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime?>("Run_M")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly?>("Run_M")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime>("Start")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("Start")
+                        .HasColumnType("time");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
+                    b.Property<string>("StartPosition")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TShirtSize")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeOnly?>("Time")
+                        .HasColumnType("time");
+
+                    b.Property<int>("Weight")
+                        .HasColumnType("int");
 
                     b.HasKey("EventAttributeFK", "ParticipantFK");
 

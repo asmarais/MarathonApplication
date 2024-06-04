@@ -47,21 +47,30 @@ namespace MarathonApplication.Controllers
 			{
 				return BadRequest();
 			}
+
 			var user = _db.Users.FirstOrDefault(u => u.Id == id);
 			if (user == null)
 			{
 				return NotFound();
 			}
-			//I want to have the first element not a list
-			var role = _db.Roles.Where(u => u.Id == user.Role.Id);
-			var results = new
+
+			_db.Entry(user).Reference(u => u.Role).Load();
+
+			if (user.Role == null)
+			{
+				return NotFound("Role not found for the user.");
+			}
+
+			var result = new
 			{
 				UserName = user.Username,
-				Role = role		
+				Role = user.Role.role,
 			};
-			return Ok(results);
+
+			return Ok(result);
 		}
-		
+
+
 		[HttpDelete("{id:int}")]
 		public IActionResult DeleteUser(int id)
 		{
@@ -75,18 +84,46 @@ namespace MarathonApplication.Controllers
 			_db.SaveChanges();
 			return NoContent();
 		}
-		
-		[HttpPut("{id:int}")]
-		public IActionResult UpdateUser(int id, [FromBody] User user)
+		public class UserUpdateDto
 		{
-			if (user == null)
+			public required string Username { get; set; }
+			public required string Role { get; set; }
+		}
+
+		[HttpPut("{id:int}")]
+		public IActionResult UpdateUser(int id, [FromBody] UserUpdateDto updatedUser)
+		{
+			if (updatedUser == null)
+			{
+				return BadRequest("User data is null");
+			}
+
+			var existingUser = _db.Users.Include(u => u.Role).FirstOrDefault(u => u.Id == id);
+			if (existingUser == null)
 			{
 				return NotFound();
 			}
-			_db.Users.Update(user);
+
+			existingUser.Username = updatedUser.Username;
+
+			if (updatedUser.Role != null)
+			{
+				var existingRole = _db.Roles.FirstOrDefault(r => r.role == updatedUser.Role);
+				if (existingRole != null)
+				{
+					existingUser.Role = existingRole;
+				}
+				else
+				{
+					return BadRequest("Invalid role ID");
+				}
+			}
+
+			_db.Users.Update(existingUser);
 			_db.SaveChanges();
-			return Ok(user);
+
+			return Ok(existingUser);
 		}
-		
+
 	}
 }

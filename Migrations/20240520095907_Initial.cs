@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MarathonApplication.Migrations
 {
     /// <inheritdoc />
-    public partial class TablesTodDb : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -52,10 +52,6 @@ namespace MarathonApplication.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Birthday = table.Column<DateOnly>(type: "date", nullable: false),
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -137,17 +133,21 @@ namespace MarathonApplication.Migrations
                 {
                     EventAttributeFK = table.Column<int>(type: "int", nullable: false),
                     ParticipantFK = table.Column<int>(type: "int", nullable: false),
-                    Id = table.Column<int>(type: "int", nullable: false),
                     Registration = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Start = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Run_10 = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Run_20 = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Run_HM = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Run_30 = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Run_40 = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Run_M = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TShirtSize = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Start = table.Column<TimeOnly>(type: "time", nullable: false),
+                    Run_10 = table.Column<TimeOnly>(type: "time", nullable: true),
+                    Run_20 = table.Column<TimeOnly>(type: "time", nullable: true),
+                    Run_HM = table.Column<TimeOnly>(type: "time", nullable: true),
+                    Run_30 = table.Column<TimeOnly>(type: "time", nullable: true),
+                    Run_40 = table.Column<TimeOnly>(type: "time", nullable: true),
+                    Run_M = table.Column<TimeOnly>(type: "time", nullable: true),
+                    TShirtSize = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Weight = table.Column<int>(type: "int", nullable: false),
+                    Calories = table.Column<int>(type: "int", nullable: true),
+                    StartPosition = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EndPosition = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Time = table.Column<TimeOnly>(type: "time", nullable: true),
+                    Pace = table.Column<TimeOnly>(type: "time", nullable: true)
                 },
                 constraints: table =>
                 {

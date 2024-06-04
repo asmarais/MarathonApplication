@@ -82,8 +82,6 @@ namespace MarathonApplication.Controllers.Authentication
 			});
 		}
 
-
-
 		private User ValidateRefreshToken(RefreshToken refreshToken)
 		{
 			var user = _db.Users.Where(u => u.RefreshToken == refreshToken.Token && u.TokenExpiryDate >= DateTime.UtcNow).FirstOrDefault(); 
