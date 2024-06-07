@@ -290,7 +290,7 @@ namespace MarathonApplication.Controllers
 			{
 				obj.StartPositionLatitude = startPositionLatitude;
 				obj.StartPositionLongitude = startPositionLongitude;
-				
+
 
 				_db.SaveChanges();
 				return Ok("Start Position updated successfully.");
@@ -364,8 +364,34 @@ namespace MarathonApplication.Controllers
 				return participant.Id;
 			}
 			return 0;
-			
+
+
+
 		}
-		
+		[HttpDelete("DeleteRun")]
+		public IActionResult DeleteRun(string email, int eventAttributeFk)
+		{
+			var participant = _db.Participants.FirstOrDefault(p => p.Email == email);
+
+			if (participant == null)
+			{
+				return BadRequest("Participant not found.");
+			}
+
+			var runToDelete = _db.Participantsruns
+				.FirstOrDefault(pr => pr.ParticipantFK == participant.Id && pr.EventAttributeFK == eventAttributeFk);
+
+			if (runToDelete == null)
+			{
+				return NotFound("ParticipantRun not found.");
+			}
+
+			_db.Participantsruns.Remove(runToDelete);
+			_db.SaveChanges();
+
+			return Ok("ParticipantRun deleted successfully.");
+		}
+
+
 	}
 }

@@ -48,7 +48,7 @@ namespace MarathonApplication.Controllers
 				{
 					_db.EventAttributes.Add(attribute);
 					_db.SaveChanges();
-					return CreatedAtAction(nameof(GetEventAttributes), new { id = attribute.Id }, attribute);
+					return CreatedAtAction(nameof(GetEventAttributes), new { id = attribute.Id }, attribute.Id);
 				}
 				else
 				{

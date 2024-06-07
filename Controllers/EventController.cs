@@ -117,7 +117,7 @@ namespace MarathonApplication.Controllers
 
 				_db.Events.Add(even);
 				_db.SaveChanges();
-				return CreatedAtAction(nameof(GetEvent), new { id = even.Id });
+				return CreatedAtAction(nameof(GetEvent), new { id = even.Id }, even.Id);
 
 			}
 			catch (Exception)
